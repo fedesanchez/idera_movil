@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>IDERA</title>
+
+    <link rel="stylesheet" href="assets/css/app.css">
+
+    <link rel="apple-touch-icon" sizes="76x76" href="assets/img/favicon-76.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="assets/img/favicon-120.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="assets/img/favicon-152.png">
+    <link rel="icon" sizes="196x196" href="assets/img/favicon-196.png">
+    <link rel="icon" type="image/x-icon" href="assets/img/favicon.ico">
+  </head>
+
+  <body onload="main()">
+    
+    <div class="navbar navbar-inverse navbar-fixed-top" role="navigation" id="barra" style="display:none">
+      <div class="navbar-header">
+        <div class="navbar-icon-container">
+          
+          <a href="#" class="navbar-icon pull-right visible-xs" id="sidebar-toggle-btn"><i class="fa fa-search fa-lg white"></i></a>
+        </div>
+        <a class="navbar-brand" href="#">Aplicación móvil IDERA</a>
+      </div>
+      
+    </div>
+
+    <div id="container" style="display:none">
+      <div id="sidebar">
+       <div class="sidebar-wrapper">
+        <div class="panel panel-default" id="features">
+            
+            <div class="panel-body">
+              
+                <div class="list-group" id="categorias">
+                    <a href="#" id="escuela" class="list-group-item">Escuelas</a>
+                    <a href="#" id="universidad" class="list-group-item">Universidades</a>
+                    <a href="#" id="salud" class="list-group-item">Salud Pública</a>
+                    <a href="#" id="comisaria" class="list-group-item">Comisarias</a>
+                </div>
+                
+                <div class="list-group" id="resultados">
+                    
+                </div>
+                
+                <div id="opcion-consulta" class="form-group">                    
+                   <p>
+                    <label>Click en el mapa</label>                   
+                    <input  value="click-mapa" type="radio" name="opcion" checked>
+                   </p>
+                   <p>
+                     <label>Posicion actual</label>                       
+                     <input id="posicion" value="posicion" type="radio" name="opcion">                  
+                   </p>                    
+                </div>
+                
+                <button id="resetearBusqueda" style="display: none" type="button" class="btn btn-info center-block">Volver a buscar</button>      
+            </div>
+            <div class="alert alert-info" role="alert">Seleccionar categoria para buscar los eventos mas cercanos</div>
+            
+        </div>
+       </div>
+      </div>
+      <div id="map"></div>
+    </div>
+    
+       
+      
+        <div class="loading">
+            <div id="deviceready" class="blink">
+                <p class="event listening">Cargando mapa</p>              
+            </div>
+        </div>
+        
+        <link rel="stylesheet" href="assets/css/bootstrap.min.css">
+        <link rel="stylesheet" href="assets/css/font-awesome.min.css">
+        <link rel="stylesheet" href="assets/css/leaflet.css">
+        <link rel="stylesheet" href="assets/css/L.Control.Locate.css">
+        <link rel="stylesheet" href="assets/leaflet-groupedlayercontrol/leaflet.groupedlayercontrol.css">
+        <link href="assets/css/bootstrap-switch.min.css" rel="stylesheet">
+      
+        <script src="assets/js/jquery-1.11.1.min.js"></script>
+        <script type="text/javascript" src="assets/js/app.js"></script>
+        <script src="assets/js/bootstrap.min.js"></script>    
+        <script src="assets/js/leaflet.js"></script>
+        <script src="assets/js/L.Control.Locate.js"></script>
+        <script src="assets/leaflet-groupedlayercontrol/leaflet.groupedlayercontrol.js"></script>
+        <script src="assets/js/app.js"></script>
+        <script src="assets/js/bootstrap-switch.min.js"></script>
+
+        <script type="text/javascript">
+            var map;
+            function main(){
+               setTimeout(function(){app.inicializar();},1000) ;    
+            }
+            
+        </script>
+  </body>
+    
+</html>
