@@ -69,6 +69,15 @@ input[type="radio"], input[type="checkbox"] {
     -moz-transition: all 0.25s ease-out;
     transition: all 0.25s ease-out;
 }
+#layersbar {
+  width: 250px;
+  height: 100%;
+  max-width: 100%;
+  float: right;
+  -webkit-transition: all 0.25s ease-out;
+    -moz-transition: all 0.25s ease-out;
+    transition: all 0.25s ease-out;
+}
 #map {
   width: auto;
   height: 100%;
@@ -148,6 +157,9 @@ input[type="radio"], input[type="checkbox"] {
   #sidebar {
     display: none;
   }
+  #layersbar {
+    display: none;
+  }
   .url-break {
     word-break: break-all;
     word-break: break-word;
@@ -162,3 +174,4 @@ input[type="radio"], input[type="checkbox"] {
 .panel-body {
     padding: 0px !important;
 }
+

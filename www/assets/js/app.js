@@ -19,12 +19,7 @@ var app = {
       $("#barra").fadeIn("slow");
       $("#container").fadeIn("slow");
              
-      // Highlight search box text on click /
-      /*
-      $("#searchbox").click(function () {
-        $(this).select();
-      });
-      */
+      
       
       $("#nav-btn").click(function() {
         $(".navbar-collapse").collapse("toggle");
@@ -33,15 +28,23 @@ var app = {
 
       $("#sidebar-toggle-btn").click(function() {
         $("#sidebar").toggle();
-        //map.invalidateSize();
+        
         return false;
       });
 
-/*
-      $("#sidebar-hide-btn").click(function() {
-        $('#sidebar').hide();
+       $("#layersbar-toggle-btn").click(function() {
+        $("#layersbar").toggle();
+        
+        return false;
       });
-*/      
+
+      $("#capas-base tr").click(function(e){
+      	var capa=$(this).attr('id');
+      	var td = $(this).find("td:last");
+		$("#capas-base .fa-check").removeClass("fa fa-check");      	
+      	$(td).addClass("fa fa-check");
+      });  
+      
       $("#categorias tr").click(function(e) {
         
         var categoria=$(this).attr('id');
@@ -77,9 +80,7 @@ var app = {
 
       this.inicializarMapa();
     },
-    inicializarMapa: function(){
-        
-      // Servicios
+    inicializarMapa: function(){  
       var WMSmapaeducativo="http://www.mapaeducativo.edu.ar/geoserver/ogc/wms";
       var WMSgobierno ="http://sig.gobierno.gba.gov.ar:8080/geoserver/wms";
 
@@ -205,16 +206,13 @@ var app = {
         } else {
           var isCollapsed = false;
       }
-        
-      L.control.groupedLayers(baseLayers, groupedOverlays, {
-        collapsed: isCollapsed
-      }).addTo(map);
-
+      
+             
       this.mapa=map;
     },
     buscar: function(categoria,latlng){
         $.ajax({
-                url:"http://192.168.0.104/idera_movil_web/buscar.php",
+                url:"http://localhost/idera_movil_web/buscar.php",
                 data:{
                      x:latlng.lat,
                      y:latlng.lng,
