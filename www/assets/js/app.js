@@ -20,9 +20,11 @@ var app = {
       $("#container").fadeIn("slow");
              
       // Highlight search box text on click /
+      /*
       $("#searchbox").click(function () {
         $(this).select();
       });
+      */
       
       $("#nav-btn").click(function() {
         $(".navbar-collapse").collapse("toggle");
@@ -35,43 +37,37 @@ var app = {
         return false;
       });
 
+/*
       $("#sidebar-hide-btn").click(function() {
         $('#sidebar').hide();
       });
-      
-      $("#categorias .list-group-item").click(function(e) {
-        //borro si hay algun activo
-        $("#categorias .list-group-item").each(function(){
-            $(this).removeClass("active");
-        });
-        $(this).addClass("active");
+*/      
+      $("#categorias tr").click(function(e) {
+        
+        var categoria=$(this).attr('id');
+        $("#opcion-consulta").data("categoria",categoria);
+
+        $("#categorias").hide();
         $("#opcion-consulta").fadeIn("slow");
-        
-         var valor=$(this).attr('id');
-        var opcion=$("#opcion-consulta input[type='radio']:checked").val();
-        if(opcion==="posicion"){
-            app.buscar(valor,app.locateControl._circleMarker.getLatLng());
-        }else{
-            app.mostrarMensaje("Haga click en el mapa para encontrar los lugares mas cercanos");
-            map.on("click", function(e) {
-		app.buscar(valor,e.latlng);        	 
-            });
-            setTimeout(function(){$("#sidebar").hide();},2500);
-        }
-        
-         
       });
       
-      // cuesta mucho usarlo en los celus
-    //$("#opcion-consulta input[type='radio']").bootstrapSwitch();
-    
-    //$("#opcion-consulta input[type='radio']").on('switchChange.bootstrapSwitch', function (e) {
-       $("#opcion-consulta input[type='radio']").change(function(){
+       $("#opcion-consulta button").click(function(){
         var opcion=$(this).val();
-           //posicion=$("#posicion").bootstrapSwitch('state'); 
-       if(opcion==="posicion"){
-           app.locateControl.locate();
-       }
+        var categoria=$("#opcion-consulta").data("categoria");
+
+       if(opcion==="posicion-actual"){
+          app.mostrarMensaje("Buscando los eventos cercanos a su posicion");
+          map.locate({setView: true, watch: true}).on('locationfound', 
+            function(e){
+              // TODO : agregar marker y circulo de la posicion               
+              app.buscar(categoria,e.latlng);              
+            });
+       }else{
+              app.mostrarMensaje("Seleccione con un click en el mapa el lugar donde quiere hacer la busqueda");
+              map.on("click", function(e) {                
+                app.buscar(categoria,e.latlng);                          
+              });
+        }    
     });
     
     $("#resetearBusqueda").click(function(e){
@@ -218,19 +214,17 @@ var app = {
     },
     buscar: function(categoria,latlng){
         $.ajax({
-                url:"http://192.168.0.105/idera_movil/buscar.php",
+                url:"http://192.168.0.104/idera_movil_web/buscar.php",
                 data:{
                      x:latlng.lat,
                      y:latlng.lng,
                      tipo:categoria
                 }
-		})
-       		 .done(function(e) {                	
-                        app.mostrarResultados(e);
-                            
+		    }).done(function(e) {                	
+              app.mostrarResultados(e);                    
         	})
         	 .fail(function() {
-                	this.mostrarMensaje( "ERROR: error en la busqueda, revisar log" );
+                	app.mostrarMensaje( "ERROR: error en la busqueda, revisar log" );
         	});
     },
     formatearaGeojson:function(f){
@@ -247,17 +241,25 @@ var app = {
         return g;                    
     },
     mostrarResultados: function(r){      
-        $(".alert").fadeOut();
-        $("#resultados").fadeOut();
         $("#resultados").html("");
-        $("#opcion-consulta").fadeOut();
+        $("#opcion-consulta").hide();
+        $("#msg").hide();
         
-        $("#categorias").fadeOut("slow");        
+        $("#categorias").hide();        
+        
         $.each( r, function( key, val ) {
-                $("#resultados").append( "<a href='#' class='list-group-item' id='" + key + "'>" + val.nombre + "</a>" );
+                //$("#resultados").append( "<a href='#' class='list-group-item' id='" + key + "'>" + val.nombre + "</a>" );
+                $("#resultados").append("<tr class='feature-row' id="+key+">\
+                      <td style='vertical-align: middle;'>\
+                        <img width='16' height='18' src='assets/img/comisarias.png'></td>\
+                      <td class='feature-name'>"+val.nombre+"</td>\
+                      <td style='vertical-align: middle;'>\
+                          <i class='fa fa-chevron-right pull-right'></i>\
+                      </td>\
+                    </tr>");
         });
                 
-        $("#resultados .list-group-item").click(function(e){
+        $("#resultados tr").click(function(e){
             var feature=app.formatearaGeojson(r[$(this).attr('id')]);
             var icono = {
                 radius: 8,
@@ -282,18 +284,19 @@ var app = {
     
     },
     resetearBusqueda:function(){
-        $("#resultados").fadeOut();
+        
         $("#resultados").html("");
         
         $("#categorias").fadeIn();
-        $("#opcion-consulta").fadeIn();
+        $("#opcion-consulta").fadeOut();
         $("#resetearBusqueda").fadeOut();
         
     },
     mostrarMensaje:function(msg){
-        $(".alert").fadeOut("fast");
-        $(".alert").html(msg);
-        $(".alert").fadeIn("slow");            
+        $("#opcion-consulta").hide();
+        $("#msg").fadeOut("fast");
+        $("#msg").html(msg);
+        $("#msg").fadeIn("slow");            
     }
     
     

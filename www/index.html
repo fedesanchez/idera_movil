@@ -34,40 +34,74 @@
     <div id="container" style="display:none">
       <div id="sidebar">
        <div class="sidebar-wrapper">
-        <div class="panel panel-default" id="features">
-            
-            <div class="panel-body">
-              
-                <div class="list-group" id="categorias">
-                    <a href="#" id="escuela" class="list-group-item">Escuelas</a>
-                    <a href="#" id="universidad" class="list-group-item">Universidades</a>
-                    <a href="#" id="salud" class="list-group-item">Salud Pública</a>
-                    <a href="#" id="comisaria" class="list-group-item">Comisarias</a>
-                </div>
+
+        <div class="sidebar-table">
+              <table class="table table-hover" id="feature-list">
                 
-                <div class="list-group" id="resultados">
-                    
-                </div>
+                <tbody class="list" id="categorias">
+                    <tr class="feature-row" id="escuela">
+                      <td style="vertical-align: middle;">
+                        <img width="16" height="18" src="assets/img/escuelas.png"></td>
+                      <td class="feature-name">Escuelas</td>
+                      <td style="vertical-align: middle;">
+                          <i class="fa fa-chevron-right pull-right"></i>
+                      </td>
+                    </tr>
+                    <tr class="feature-row" id="universidad">
+                      <td style="vertical-align: middle;">
+                        <img width="16" height="18" src="assets/img/universidades.png"></td>
+                      <td class="feature-name">Universidades</td>
+                      <td style="vertical-align: middle;">
+                          <i class="fa fa-chevron-right pull-right"></i>
+                      </td>
+                    </tr>
+                    <tr class="feature-row" id="salud">
+                      <td style="vertical-align: middle;">
+                        <img width="16" height="18" src="assets/img/salud.png"></td>
+                      <td class="feature-name">Salud Pública</td>
+                      <td style="vertical-align: middle;">
+                          <i class="fa fa-chevron-right pull-right"></i>
+                      </td>
+                    </tr>
+                    <tr class="feature-row" id="comisaria">
+                      <td style="vertical-align: middle;">
+                        <img width="16" height="18" src="assets/img/comisarias.png"></td>
+                      <td class="feature-name">Comisarias</td>
+                      <td style="vertical-align: middle;">
+                          <i class="fa fa-chevron-right pull-right"></i>
+                      </td>
+                    </tr>
+                </tbody>
+              </table>
+
+              <table class="table table-hover" id="feature-list-resultados">
+                <tbody class="list" id="resultados">
+                </tbody>
+              </table>  
+        </div>        
                 
-                <div id="opcion-consulta" class="form-group">                    
-                   <p>
-                    <label>Click en el mapa</label>                   
-                    <input  value="click-mapa" type="radio" name="opcion" checked>
-                   </p>
-                   <p>
-                     <label>Posicion actual</label>                       
-                     <input id="posicion" value="posicion" type="radio" name="opcion">                  
-                   </p>                    
-                </div>
-                
-                <button id="resetearBusqueda" style="display: none" type="button" class="btn btn-info center-block">Volver a buscar</button>      
-            </div>
-            <div class="alert alert-info" role="alert">Seleccionar categoria para buscar los eventos mas cercanos</div>
-            
-        </div>
+        <div id="opcion-consulta"  style="display:none">                    
+          <p>
+          <button value="click-mapa"  type="button" class="btn btn-info center-block">
+            Seleccionando en el mapa
+          </button>
+        </p>
+        <p>
+          <button value="posicion-actual" type="button" class="btn btn-info center-block">
+            Segun la posicion actual
+          </button>
+         </p>
+         <div class="alert alert-info" role="alert">Elegir de que forma quiere buscar los datos</div> 
+         </div>
+        
+        <div class="alert alert-info" style="display:none" id="msg"></div>        
+        <button id="resetearBusqueda" style="display:none" type="button" class="btn btn-info center-block">Volver a buscar</button>
+        
        </div>
       </div>
       <div id="map"></div>
+      
+      
     </div>
     
        
