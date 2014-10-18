@@ -25,6 +25,11 @@ var app = {
         return false;
       });
 
+      $(".esconder-panel").click(function(){
+        var lado=$(this).data("side");
+        (lado=="left")? $("#sidebar").toggle() : $("#layersbar").toggle() ;
+      });
+
       $("#sidebar-toggle-btn").click(function() {
         $("#sidebar").toggle();
         
