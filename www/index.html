@@ -27,18 +27,42 @@
           <a href="#" class="navbar-icon pull-left visible-xs" id="sidebar-toggle-btn"><i class="fa fa-search fa-lg white"></i></a>
           <a href="#" class="navbar-icon pull-right visible-xs" id="layersbar-toggle-btn"><i class="fa fa-database fa-lg white"></i></a>
         </div>
-        <a class="navbar-brand" href="#">Aplicación móvil IDERA</a>
+        <a class="navbar-brand" href="#">Idera Móvil</a>
       </div>
       
     </div>
 
     <div id="container" style="display:none">
       <div id="sidebar">
-       <div class="sidebar-wrapper">
+        <div class="panel-heading">
+              <h3 class="panel-title">Buscar 
+              <button type="button" class="btn btn-xs btn-default pull-right" id="sidebar-hide-btn"><i class="fa fa-chevron-left"></i></button></h3>
+        </div>
+        <div id="opcion-consulta"  style="display:none">                    
+           <p>
+            <button value="click-mapa"  type="button" class="btn btn-info center-block">
+              Seleccionando en el mapa
+            </button>
+           </p>
+           <p>
+            <button value="posicion-actual" type="button" class="btn btn-info center-block">
+              Segun la posicion actual
+            </button>
+           </p>
+           <div class="alert alert-info" role="alert">Elegir de que forma quiere buscar los datos</div> 
+        </div> <!-- fin opcion-consulta -->
+        
+        <div class="alert alert-info" style="display:none" id="msg"></div>        
+          
+      
 
-        <div class="sidebar-table">
-              <table class="table table-hover" id="feature-list">
-                
+       <div class="sidebar-wrapper">
+         <div class="panel panel-default" id="features">            
+
+         <div class="sidebar-table">
+            <button id="resetearBusqueda" style="display:none" type="button" class="btn btn btn-primary center-block">Volver a buscar</button>
+        
+              <table class="table table-hover" id="feature-list">                
                 <tbody class="list" id="categorias">
                     <tr class="feature-row" id="escuela">
                       <td style="vertical-align: middle;">
@@ -79,73 +103,69 @@
                 <tbody class="list" id="resultados">
                 </tbody>
               </table>  
-        </div>        
+
+         </div> <!-- fin de sibebar-tablr-->        
                 
-        <div id="opcion-consulta"  style="display:none">                    
-          <p>
-          <button value="click-mapa"  type="button" class="btn btn-info center-block">
-            Seleccionando en el mapa
-          </button>
-        </p>
-        <p>
-          <button value="posicion-actual" type="button" class="btn btn-info center-block">
-            Segun la posicion actual
-          </button>
-         </p>
-         <div class="alert alert-info" role="alert">Elegir de que forma quiere buscar los datos</div> 
          </div>
+       </div> <!-- fin panel -->
+      
         
-        <div class="alert alert-info" style="display:none" id="msg"></div>        
-        <button id="resetearBusqueda" style="display:none" type="button" class="btn btn-info center-block">Volver a buscar</button>
-        
-       </div>
-      </div>
+      </div> <!-- sidebar -->
+      
       <div id="layersbar">
-        <div class="sidebar-wrapper">          
-          <div class="sidebar-table">
-              <table class="table table-hover" id="layer-list">
-                
-                <tbody class="list" id="capas-base">
-                    <tr class="feature-row" id="google-calles">
-                      <td style="vertical-align: middle;">
-                        <i class="fa fa-dot-circle-o"></i></td>
-                      <td class="feature-name">Google Callejero</td>
-                      <td style="vertical-align: middle;">                          
-                      </td>
-                    </tr>
-                    <tr class="feature-row" id="google-satelital">
-                      <td style="vertical-align: middle;">
-                        <i class="fa fa-dot-circle-o"></i></td>
-                      <td class="feature-name">Google Satelital</td>
-                      <td style="vertical-align: middle;">
-                          
-                      </td>
-                    </tr>
-                    <tr class="feature-row" id="osm">
-                      <td style="vertical-align: middle;">
-                        <i class="fa fa-dot-circle-o"></i></td>
-                      <td class="feature-name">Open Street Map</td>
-                      <td style="vertical-align: middle;">
-                          <i class="fa fa-check"></i>
-                      </td>
-                    </tr>
-                    <tr class="feature-row" id="ign">
-                      <td style="vertical-align: middle;">
-                        <i class="fa fa-dot-circle-o"></i></td>
-                      <td class="feature-name">IGN</td>
-                      <td style="vertical-align: middle;">
-                          
-                      </td>
-                    </tr>
-                </tbody>    
-               </table>
-          </div>        
+        <div class="panel-heading">
+              <h3 class="panel-title">Capas 
+              <button type="button" class="btn btn-xs btn-default pull-right" id="sidebar-hide-btn"><i class="fa fa-chevron-right"></i></button></h3>
+        </div>
+        <div class="sidebar-wrapper">                    
+          <div class="panel panel-default" id="features">            
+            <div class="sidebar-table">
+                <table class="table table-hover" id="layer-list">
+                  
+                  <tbody class="list" id="capas-base">
+                      <tr class="feature-row" id="google-calles">
+                        <td style="vertical-align: middle;">
+                          <i class="fa fa-dot-circle-o"></i></td>
+                        <td class="feature-name">Google Callejero</td>
+                        <td style="vertical-align: middle;">                          
+                        </td>
+                      </tr>
+                      <tr class="feature-row" id="google-satelital">
+                        <td style="vertical-align: middle;">
+                          <i class="fa fa-dot-circle-o"></i></td>
+                        <td class="feature-name">Google Satelital</td>
+                        <td style="vertical-align: middle;">
+                            
+                        </td>
+                      </tr>
+                      <tr class="feature-row" id="osm">
+                        <td style="vertical-align: middle;">
+                          <i class="fa fa-dot-circle-o"></i></td>
+                        <td class="feature-name">Open Street Map</td>
+                        <td style="vertical-align: middle;">
+                            <i class="fa fa-check"></i>
+                        </td>
+                      </tr>
+                      <tr class="feature-row" id="ign">
+                        <td style="vertical-align: middle;">
+                          <i class="fa fa-dot-circle-o"></i></td>
+                        <td class="feature-name">IGN</td>
+                        <td style="vertical-align: middle;">
+                            
+                        </td>
+                      </tr>
+                  </tbody>    
+                 </table>
+            </div> 
+         </div>        
         </div>
       </div>
-      <div id="map"></div>
+      <div id="map">
+          
+      </div>
       
      
-
+        
     </div>
     
        
@@ -188,7 +208,7 @@
                 var izq = document.getElementById('sidebar');
                 var mc = new Hammer(izq);
                 mc.on("panleft", function(ev) {                   
-                    $("#sidebar").fadeOut("slow");
+                    $("#sidebar").fadeOut({ duration: 300, queue: false }).slideUp(300);
                 });
 
                 var der = document.getElementById('layersbar');

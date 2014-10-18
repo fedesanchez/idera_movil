@@ -16,10 +16,9 @@ var app = {
         $(".loading").fadeOut("slow");
     },
     inicializarTemplateBootstrap: function(){
+      $.support.cors = true; //para buscar en idera
       $("#barra").fadeIn("slow");
-      $("#container").fadeIn("slow");
-             
-      
+      $("#container").fadeIn("slow");                   
       
       $("#nav-btn").click(function() {
         $(".navbar-collapse").collapse("toggle");
@@ -45,6 +44,7 @@ var app = {
       	$(td).addClass("fa fa-check");
       });  
       
+      // al seleccionar categoria
       $("#categorias tr").click(function(e) {
         
         var categoria=$(this).attr('id');
@@ -66,7 +66,7 @@ var app = {
               app.buscar(categoria,e.latlng);              
             });
        }else{
-              app.mostrarMensaje("Seleccione con un click en el mapa el lugar donde quiere hacer la busqueda");
+              app.mostrarMensajeFlotante("Seleccione con un click <br>donde quiere realizar la búsqueda");
               map.on("click", function(e) {                
                 app.buscar(categoria,e.latlng);                          
               });
@@ -181,6 +181,16 @@ var app = {
         }
       }).addTo(map);
 
+      // div para mostrar mensajes
+      var info = L.control({position: 'bottomleft'});
+
+      info.onAdd = function (map) {
+          this._div = L.DomUtil.create('div', 'msg-flotante'); // create a div with a class "info"
+          //this._div.innerHTML = '<h4>mensajito</h4>';
+          return this._div;
+      };  
+      info.addTo(map);
+/*
       var baseLayers = {
         "Street Map": mapquestOSM,
         "Aerial Imagery": mapquestOAM,
@@ -199,7 +209,7 @@ var app = {
           "<img src='assets/img/comisarias.png' >&nbsp;Comisarias": comisarias
       }
       };
-     
+  */   
      // Larger screens get expanded layer control and visible sidebar /
       if (document.body.clientWidth <= 767) {
          var isCollapsed = true;
@@ -212,7 +222,7 @@ var app = {
     },
     buscar: function(categoria,latlng){
         $.ajax({
-                url:"http://localhost/idera_movil_web/buscar.php",
+                url:"http://www.idera.gob.ar/mapa/idera_movil/buscar.php",
                 data:{
                      x:latlng.lat,
                      y:latlng.lng,
@@ -222,7 +232,7 @@ var app = {
               app.mostrarResultados(e);                    
         	})
         	 .fail(function() {
-                	app.mostrarMensaje( "ERROR: error en la busqueda, revisar log" );
+                	app.mostrarMensaje( "ERROR: error al conectarse al servidor." );
         	});
     },
     formatearaGeojson:function(f){
@@ -295,6 +305,15 @@ var app = {
         $("#msg").fadeOut("fast");
         $("#msg").html(msg);
         $("#msg").fadeIn("slow");            
+    },
+    mostrarMensajeFlotante:function(msg){
+      $("#sidebar").fadeOut();
+      $(".msg-flotante").html(msg);
+      $(".msg-flotante").fadeIn("slow");
+      setTimeout(function() {
+            $('.msg-flotante').fadeOut("slow");
+        }, 3000);
+
     }
     
     
