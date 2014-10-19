@@ -120,49 +120,28 @@
         <div class="sidebar-wrapper">                    
           <div class="panel panel-default" id="features">            
             <div class="sidebar-table">
-                <table class="table table-hover" id="layer-list">
-                  
+                <p>Capas Base</p>
+                <table class="table table-hover" id="layer-list">                  
                   <tbody class="list" id="capas-base">
-                      <tr class="feature-row" id="google-calles">
-                        <td style="vertical-align: middle;">
-                          <i class="fa fa-dot-circle-o"></i></td>
-                        <td class="feature-name">Google Callejero</td>
-                        <td style="vertical-align: middle;">                          
-                        </td>
-                      </tr>
-                      <tr class="feature-row" id="google-satelital">
-                        <td style="vertical-align: middle;">
-                          <i class="fa fa-dot-circle-o"></i></td>
-                        <td class="feature-name">Google Satelital</td>
-                        <td style="vertical-align: middle;">
-                            
-                        </td>
-                      </tr>
-                      <tr class="feature-row" id="osm">
-                        <td style="vertical-align: middle;">
-                          <i class="fa fa-dot-circle-o"></i></td>
-                        <td class="feature-name">Open Street Map</td>
-                        <td style="vertical-align: middle;">
-                            <i class="fa fa-check"></i>
-                        </td>
-                      </tr>
-                      <tr class="feature-row" id="ign">
-                        <td style="vertical-align: middle;">
-                          <i class="fa fa-dot-circle-o"></i></td>
-                        <td class="feature-name">IGN</td>
-                        <td style="vertical-align: middle;">
-                            
-                        </td>
-                      </tr>
+                    <!-- se generan en app.js-->
+                  </tbody>    
+                 </table>
+                 <p>Capas Superpuestas</p>
+                 <table class="table table-hover" id="overlay-list">                  
+                  <tbody class="list" id="capas-superpuestas">
+                    <!-- se generan en app.js-->
                   </tbody>    
                  </table>
             </div> 
-         </div>        
+         </div>
+
+
+
         </div>
+
       </div>
-      <div id="map">
-          
-      </div>
+      
+      <div id="map"></div>
       
      
         
@@ -181,8 +160,6 @@
         <link rel="stylesheet" href="assets/css/leaflet.css">
         <link rel="stylesheet" href="assets/css/L.Control.Locate.css">
         
-        <!--<link rel="stylesheet" href="assets/leaflet-groupedlayercontrol/leaflet.groupedlayercontrol.css">-->
-
         
       
         <script src="assets/js/jquery-1.11.1.min.js"></script>
@@ -192,7 +169,6 @@
         
         <script src="assets/js/L.Control.Locate.js"></script>
         
-        <!--<script src="assets/leaflet-groupedlayercontrol/leaflet.groupedlayercontrol.js"></script>-->
         
         <script src="assets/js/app.js"></script>
         

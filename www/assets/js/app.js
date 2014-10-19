@@ -4,8 +4,87 @@
  */
 
 var app = {
-    // Application Constructor
+    // Application Constructor    
     mapa:null,
+    servicios:{
+      "mapaeducativo":"http://wms.mapaeducativo.edu.ar/geoserver/ogc/wms",
+      "gobiernoGBA":"http://sig.gobierno.gba.gov.ar:8080/geoserver/wms"
+    },
+    capas:{
+      base:[
+        {
+          id:"osm",
+          titulo:"OSM",
+          url:"http://{s}.mqcdn.com/tiles/1.0.0/osm/{z}/{x}/{y}.png",
+          maxZoom: 19,
+          base:true,
+          activa:false,
+          subdomains: ["otile1", "otile2", "otile3", "otile4"],
+          attribution:''
+        },
+        {
+          id:"osm-sat",
+          titulo:"OSM Satelital",
+          url:"http://{s}.mqcdn.com/tiles/1.0.0/sat/{z}/{x}/{y}.jpg",
+          maxZoom: 19,
+          base:true,
+          activa:true,
+          subdomains: ["oatile1", "oatile2", "oatile3", "oatile4"],
+          attribution:''
+        },
+        {
+          id:"osm-hyb",
+          titulo:"OSM Hibrido",
+          url:"http://{s}.mqcdn.com/tiles/1.0.0/hyb/{z}/{x}/{y}.png",
+          maxZoom: 19,
+          base:true,
+          activa:false,
+          subdomains: ["oatile1", "oatile2", "oatile3", "oatile4"],
+          attribution:''
+        }      
+      ],
+      superpuestas:[
+        {
+          id_servicio:"mapaeducativo",
+          layers: 'escuelas',
+          format: 'image/png8',
+          transparent: true,
+          version: '1.1.0',
+          activa:false,
+          titulo:"Escuelas",
+          attribution: ""
+        },
+        {
+          id_servicio:"mapaeducativo",
+          layers: 'universidades',
+          format: 'image/png8',
+          transparent: true,
+          activa:false,
+          titulo:"Universidades",
+          version: '1.1.0',
+          attribution: ""
+        },
+        {
+          id_servicio:"gobiernoGBA",
+          layers: 'comisarias',
+          titulo:"Comisarias",
+          format: 'image/png8',
+          transparent: true,
+          activa:false,
+          version: '1.1.0',
+          attribution: ""
+        },{
+          id_servicio:"gobiernoGBA",
+          layers: 'salud2012_publicos',
+          titulo:"Salud Pública",
+          format: 'image/png8',
+          transparent: true,
+          activa:true,
+          version: '1.1.0',
+          attribution: ""
+        }
+      ]
+    },
     locateControl:null,
     posicion:null,
     inicializar: function() {        
@@ -13,7 +92,7 @@ var app = {
         this.inicializarTemplateBootstrap();
     },
     ocultarLoading: function(){
-        $(".loading").fadeOut("slow");
+      $(".loading").fadeOut("slow");
     },
     inicializarTemplateBootstrap: function(){
       $.support.cors = true; //para buscar en idera
@@ -41,13 +120,6 @@ var app = {
         
         return false;
       });
-
-      $("#capas-base tr").click(function(e){
-      	var capa=$(this).attr('id');
-      	var td = $(this).find("td:last");
-		$("#capas-base .fa-check").removeClass("fa fa-check");      	
-      	$(td).addClass("fa fa-check");
-      });  
       
       // al seleccionar categoria
       $("#categorias tr").click(function(e) {
@@ -59,98 +131,141 @@ var app = {
         $("#opcion-consulta").fadeIn("slow");
       });
       
-       $("#opcion-consulta button").click(function(){
-        var opcion=$(this).val();
-        var categoria=$("#opcion-consulta").data("categoria");
+      $("#opcion-consulta button").click(function(){
+         var opcion=$(this).val();
+         var categoria=$("#opcion-consulta").data("categoria");
 
-       if(opcion==="posicion-actual"){
-          app.mostrarMensaje("Buscando los eventos cercanos a su posicion");
-          map.locate({setView: true, watch: true}).on('locationfound', 
-            function(e){
-              // TODO : agregar marker y circulo de la posicion               
-              app.buscar(categoria,e.latlng);              
-            });
-       }else{
-              app.mostrarMensajeFlotante("Seleccione con un click <br>donde quiere realizar la búsqueda");
-              map.on("click", function(e) {                
-                app.buscar(categoria,e.latlng);                          
+         if(opcion==="posicion-actual"){
+            app.mostrarMensaje("Buscando los eventos cercanos a su posicion");
+            map.locate({setView: true, watch: true}).on('locationfound', 
+              function(e){
+                // TODO : agregar marker y circulo de la posicion               
+                app.buscar(categoria,e.latlng);              
               });
-        }    
-    });
+         }else{
+                app.mostrarMensajeFlotante("Seleccione con un click <br>donde quiere realizar la búsqueda");
+                map.on("click", function(e) {                
+                  app.buscar(categoria,e.latlng);                          
+                });
+          }    
+      });
     
-    $("#resetearBusqueda").click(function(e){
+      $("#resetearBusqueda").click(function(e){
         app.resetearBusqueda();
-    });
+      });
     
 
       this.inicializarMapa();
     },
+    cargarCapasBase:function(){
+      
+      for(var i in this.capas.base){
+        var capa = this.capas.base[i];
+        var activa = (capa.activa)?"<i class='fa fa-check fa-lg'></i>":''; //chanchada!
+        var tr ="<tr class='feature-row' id='"+capa.id+"'>\
+                        <td style='vertical-align: middle;'>\
+                          <i class='fa fa-dot-circle-o'></i></td>\
+                        <td class='feature-name'>"+capa.titulo+"</td>\
+                        <td style='vertical-align: middle;'>"+activa+"</td>\
+                      </tr>";
+        $("#capas-base").append(tr);               
+        if(capa.activa){
+           L.tileLayer(capa.url, capa).addTo(map);
+        }
+      };
+      
+      $("#capas-base tr").click(function(e){
+        var capa=$(this).attr('id');
+        var td = $(this).find("td:last");
+        $("#capas-base .fa-check").removeClass("fa fa-check fa-lg");        
+        $(td).addClass("fa fa-check fa-lg");        
+        app.cambiarCapaBase(capa);
+      });                  
+            
+    },
+    cargarCapasSuperpuestas:function(){
+      for(var i in this.capas.superpuestas){
+        var capa = this.capas.superpuestas[i];
+        var activa = (capa.activa)?"<i class='fa fa-check-circle fa-lg'></i>":'<i></i>'; //chanchada!
+        var tr ="<tr class='feature-row' id='"+capa.layers+"'>\
+                        <td style='vertical-align: middle;'>\
+                          <i class=''></i></td>\
+                        <td class='feature-name'>"+capa.titulo+"</td>\
+                        <td style='vertical-align: middle;'>"+activa+"</td>\
+                      </tr>";
+        $("#capas-superpuestas").append(tr);               
+        if(capa.activa){
+          L.tileLayer.wms(this.servicios[capa.id_servicio], capa).addTo(map);
+        }
+      };
+      $("#capas-superpuestas tr").click(function(e){
+        var id=$(this).attr('id');
+        var capa=app.getCapaPorId(id,false);
+        capa.activa=!capa.activa;
+        var activa = (capa.activa)?"fa fa-check-circle fa-lg":'';
+
+        var i = $(this).find("td:last i");      
+        $(i).removeClass("fa fa-check-circle fa-lg");
+        $(i).addClass(activa);        
+        app.toogleCapa(capa);
+      });
+    },
+    getCapaPorId:function(id,base){
+      if(base){
+        for(var i in app.capas.base){
+          if (app.capas.base[i].id==id) return app.capas.base[i];
+        }  
+      }else{
+        for(var i in app.capas.superpuestas){
+          if (app.capas.superpuestas[i].layers==id) return app.capas.superpuestas[i];
+        }
+      }      
+      
+    },
+    cambiarCapaBase:function(id){
+      map.eachLayer(function(layer){
+        if(layer.options){
+          var l=layer.options;
+          if(l.base){
+            map.removeLayer(layer);
+            var datos_nueva_capa=app.getCapaPorId(id,true);            
+            var nueva_capa=L.tileLayer(datos_nueva_capa.url, datos_nueva_capa);
+            map.addLayer(nueva_capa);
+            nueva_capa.bringToBack();
+          }
+        };
+      });
+    },
+    toogleCapa:function(capa){
+      var existe=false;
+      map.eachLayer(function(layer){
+        if(layer.options){          
+          if(!layer.options.base){
+            if(layer.options.layers==capa.layers){
+              existe=true;
+              console.log("borrando capa");
+              map.removeLayer(layer);
+            }
+          }
+        }
+      });
+      if(!existe){
+        L.tileLayer.wms(this.servicios[capa.id_servicio], capa).addTo(map);
+      }
+
+    },
     inicializarMapa: function(){  
-      var WMSmapaeducativo="http://www.mapaeducativo.edu.ar/geoserver/ogc/wms";
-      var WMSgobierno ="http://sig.gobierno.gba.gov.ar:8080/geoserver/wms";
-
-      // Basemap Layers /
-      var mapquestOSM = L.tileLayer("http://{s}.mqcdn.com/tiles/1.0.0/osm/{z}/{x}/{y}.png", {
-        maxZoom: 19,
-        subdomains: ["otile1", "otile2", "otile3", "otile4"],
-        attribution: 'Tiles courtesy of <a href="http://www.mapquest.com/" target="_blank">MapQuest</a> <img src="http://developer.mapquest.com/content/osm/mq_logo.png">. Map data (c) <a href="http://www.openstreetmap.org/" target="_blank">OpenStreetMap</a> contributors, CC-BY-SA.'
-      });
-      var mapquestOAM = L.tileLayer("http://{s}.mqcdn.com/tiles/1.0.0/sat/{z}/{x}/{y}.jpg", {
-        maxZoom: 18,
-        subdomains: ["oatile1", "oatile2", "oatile3", "oatile4"],
-        attribution: 'Tiles courtesy of <a href="http://www.mapquest.com/" target="_blank">MapQuest</a>. Portions Courtesy NASA/JPL-Caltech and U.S. Depart. of Agriculture, Farm Service Agency'
-      });
-      var mapquestHYB = L.layerGroup([L.tileLayer("http://{s}.mqcdn.com/tiles/1.0.0/sat/{z}/{x}/{y}.jpg", {
-        maxZoom: 18,
-        subdomains: ["oatile1", "oatile2", "oatile3", "oatile4"]
-      }), L.tileLayer("http://{s}.mqcdn.com/tiles/1.0.0/hyb/{z}/{x}/{y}.png", {
-        maxZoom: 19,
-        subdomains: ["oatile1", "oatile2", "oatile3", "oatile4"],
-        attribution: 'Labels courtesy of <a href="http://www.mapquest.com/" target="_blank">MapQuest</a> <img src="http://developer.mapquest.com/content/osm/mq_logo.png">. Map data (c) <a href="http://www.openstreetmap.org/" target="_blank">OpenStreetMap</a> contributors, CC-BY-SA. Portions Courtesy NASA/JPL-Caltech and U.S. Depart. of Agriculture, Farm Service Agency'
-      })]);
-
-      // Overlay Layers /
-
-      var escuelas = L.tileLayer.wms(WMSmapaeducativo, {
-          layers: 'escuelas',
-          format: 'image/png8',
-          transparent: true,
-          version: '1.1.0',
-          attribution: ""
-      });
-
-      var universidades = L.tileLayer.wms(WMSmapaeducativo, {
-          layers: 'universidades',
-          format: 'image/png8',
-          transparent: true,
-          version: '1.1.0',
-          attribution: ""
-      });
       
-      var comisarias=L.tileLayer.wms(WMSgobierno, {
-          layers: 'comisarias',
-          format: 'image/png8',
-          transparent: true,
-          version: '1.1.0',
-          attribution: ""
-      });
-      
-       var salud=L.tileLayer.wms(WMSgobierno, {
-          layers: 'salud2012_publicos',
-          format: 'image/png8',
-          transparent: true,
-          version: '1.1.0',
-          attribution: ""
-      });
-
         map=  L.map("map", {
            zoom: 7,
            center: [-36.82687474287728, 	-59.94140624999999],
-           layers: [mapquestOSM, escuelas,universidades,comisarias,salud],
+           //layers: [],
            zoomControl: false,
            attributionControl: false
         });
-        
+        this.cargarCapasBase();
+        this.cargarCapasSuperpuestas();
+
         L.control.zoom({
          position: "bottomright"
         }).addTo(map);
@@ -195,26 +310,7 @@ var app = {
           return this._div;
       };  
       info.addTo(map);
-/*
-      var baseLayers = {
-        "Street Map": mapquestOSM,
-        "Aerial Imagery": mapquestOAM,
-        "Imagery with Streets": mapquestHYB
-      };
 
-     var groupedOverlays = {
-      "Educación": {
-      "<img src='assets/img/escuelas.png' >&nbsp;Escuelas": escuelas,
-      "<img src='assets/img/universidades.png' >&nbsp;Universidades": universidades            
-      },
-      "Salud": {
-      "<img src='assets/img/salud.png' >&nbsp;Salud Pública": salud
-      },
-      "Seguridad":{
-          "<img src='assets/img/comisarias.png' >&nbsp;Comisarias": comisarias
-      }
-      };
-  */   
      // Larger screens get expanded layer control and visible sidebar /
       if (document.body.clientWidth <= 767) {
          var isCollapsed = true;
