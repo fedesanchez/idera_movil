@@ -8,7 +8,8 @@ var app = {
     mapa:null,
     servicios:{
       "mapaeducativo":"http://wms.mapaeducativo.edu.ar/geoserver/ogc/wms",
-      "gobiernoGBA":"http://sig.gobierno.gba.gov.ar:8080/geoserver/wms"
+      "gobiernoGBA":"http://sig.gobierno.gba.gov.ar:8080/geoserver/wms",
+      "IGN":"http://wms.ign.gob.ar/geoserver/wms"
     },
     capas:{
       base:[
@@ -18,7 +19,7 @@ var app = {
           url:"http://{s}.mqcdn.com/tiles/1.0.0/osm/{z}/{x}/{y}.png",
           maxZoom: 19,
           base:true,
-          activa:false,
+          activa:true,
           subdomains: ["otile1", "otile2", "otile3", "otile4"],
           attribution:''
         },
@@ -28,7 +29,7 @@ var app = {
           url:"http://{s}.mqcdn.com/tiles/1.0.0/sat/{z}/{x}/{y}.jpg",
           maxZoom: 19,
           base:true,
-          activa:true,
+          activa:false,
           subdomains: ["oatile1", "oatile2", "oatile3", "oatile4"],
           attribution:''
         },
@@ -45,41 +46,22 @@ var app = {
       ],
       superpuestas:[
         {
-          id_servicio:"mapaeducativo",
-          layers: 'escuelas',
+          id_servicio:"IGN",
+          layers: 'salud',
           format: 'image/png8',
           transparent: true,
           version: '1.1.0',
           activa:false,
-          titulo:"Escuelas",
+          titulo:"Salud",
           attribution: ""
         },
         {
           id_servicio:"mapaeducativo",
-          layers: 'universidades',
-          format: 'image/png8',
-          transparent: true,
-          activa:false,
-          titulo:"Universidades",
-          version: '1.1.0',
-          attribution: ""
-        },
-        {
-          id_servicio:"gobiernoGBA",
           layers: 'comisarias',
-          titulo:"Comisarias",
           format: 'image/png8',
           transparent: true,
           activa:false,
-          version: '1.1.0',
-          attribution: ""
-        },{
-          id_servicio:"gobiernoGBA",
-          layers: 'salud2012_publicos',
-          titulo:"Salud Pública",
-          format: 'image/png8',
-          transparent: true,
-          activa:true,
+          titulo:"Comisarias",
           version: '1.1.0',
           attribution: ""
         }
@@ -390,6 +372,7 @@ var app = {
         $("#resultados").fadeIn();
         $("#resetearBusqueda").fadeIn();
         $("#sidebar").show();
+        this.quitarEventoClick();
     
     },
     resetearBusqueda:function(){
@@ -415,6 +398,9 @@ var app = {
             $('.msg-flotante').fadeOut("slow");
         }, 3000);
 
+    },
+    quitarEventoClick:function(){
+      map.on("click",function({}));
     }
     
     
