@@ -6,6 +6,7 @@
 var app = {
     // Application Constructor    
     mapa:null,
+    features:null,
     servicios:{
       "mapaeducativo":"http://wms.mapaeducativo.edu.ar/geoserver/ogc/wms",
       "gobiernoGBA":"http://sig.gobierno.gba.gov.ar:8080/geoserver/wms",
@@ -56,7 +57,7 @@ var app = {
           attribution: ""
         },
         {
-          id_servicio:"mapaeducativo",
+          id_servicio:"IGN",
           layers: 'comisarias',
           format: 'image/png8',
           transparent: true,
@@ -172,7 +173,7 @@ var app = {
         var activa = (capa.activa)?"<i class='fa fa-check-circle fa-lg'></i>":'<i></i>'; //chanchada!
         var tr ="<tr class='feature-row' id='"+capa.layers+"'>\
                         <td style='vertical-align: middle;'>\
-                          <i class=''></i></td>\
+                          <img width='16' height='18' src='assets/img/"+capa.layers+".png'></td>\
                         <td class='feature-name'>"+capa.titulo+"</td>\
                         <td style='vertical-align: middle;'>"+activa+"</td>\
                       </tr>";
@@ -301,7 +302,9 @@ var app = {
           var isCollapsed = false;
       }
       
-             
+      
+      
+      this.features = L.geoJson().addTo(map);
       this.mapa=map;
     },
     buscar: function(categoria,latlng){
@@ -341,35 +344,38 @@ var app = {
         $("#categorias").hide();        
         
         $.each( r, function( key, val ) {
-                //$("#resultados").append( "<a href='#' class='list-group-item' id='" + key + "'>" + val.nombre + "</a>" );
-                $("#resultados").append("<tr class='feature-row' id="+key+">\
-                      <td style='vertical-align: middle;'>\
-                        <img width='16' height='18' src='assets/img/comisarias.png'></td>\
-                      <td class='feature-name'>"+val.nombre+"</td>\
-                      <td style='vertical-align: middle;'>\
-                          <i class='fa fa-chevron-right pull-right'></i>\
-                      </td>\
-                    </tr>");
+          var capa=app.features.addData(app.formatearaGeojson(r[key]));
+          
+          
+            $("#resultados").append("<tr class='feature-row' id='"+key+"'>\
+                  <td style='vertical-align: middle;'>\
+                    <img width='16' height='18' src='assets/img/"+val.tipo+".png'></td>\
+                  <td class='feature-name'>"+val.nombre+"</td>\
+                  <td style='vertical-align: middle;'>\
+                      <i class='fa fa-chevron-right pull-right'></i>\
+                  </td>\
+                </tr>");
         });
-                
+        map.fitBounds(app.features.getBounds());
+        app.features.eachLayer(function(l){
+          l.bindPopup("<b>"+l.feature.properties.nombre+"</b>");
+        });        
         $("#resultados tr").click(function(e){
-            var feature=app.formatearaGeojson(r[$(this).attr('id')]);
-            var icono = {
-                radius: 4,
-                fillColor: "#ff7800",
-                color: "#000",
-                weight: 1,
-                opacity: 1,
-                fillOpacity: 0.8
-                };
-            var layer=L.geoJson(feature,{
-                pointToLayer: function (feature, latlng) {
-                    return L.circleMarker(latlng, icono);
-                }
-            }).addTo(map);
-
-            var bounds=layer.getBounds();
-            map.fitBounds(bounds);
+            
+            var id=$(this).attr('id');
+            var cont =0;
+            app.features.eachLayer(function(l){
+              if(Number(id)==cont){
+                var latlng=l._latlng;
+                
+                map.setView(latlng,15);
+                return true;
+                //l.openPopup();
+              }else{
+                cont++;
+              }
+            });
+            
         });
         $("#resultados").fadeIn();
         $("#resetearBusqueda").fadeIn();
