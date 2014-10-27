@@ -225,7 +225,7 @@ var app = {
           if(!layer.options.base){
             if(layer.options.layers==capa.layers){
               existe=true;
-              console.log("borrando capa");
+              //console.log("borrando capa");
               map.removeLayer(layer);
             }
           }
@@ -267,12 +267,12 @@ var app = {
           weight: 1,
           clickable: false
         },
-        icon: "icon-direction",
+        //icon: "icon-direction",
         metric: false,
         strings: {
-          title: "My location",
-          popup: "You are within {distance} {unit} from this point",
-          outsideMapBoundsMsg: "You seem located outside the boundaries of the map"
+          title: "Mi ubicacion",
+          popup: "Estas a {distance} {unit} de este punto",
+          outsideMapBoundsMsg: "Parece que estas ubicado afuera de las fronteras del mapa"
         },
         locateOptions: {
           maxZoom: 18,
@@ -332,6 +332,7 @@ var app = {
         return g;                    
     },
     mostrarResultados: function(r){      
+        this.quitarEventoClick();
         $("#resultados").html("");
         $("#opcion-consulta").hide();
         $("#msg").hide();
@@ -372,7 +373,7 @@ var app = {
         $("#resultados").fadeIn();
         $("#resetearBusqueda").fadeIn();
         $("#sidebar").show();
-        this.quitarEventoClick();
+        
     
     },
     resetearBusqueda:function(){
@@ -400,7 +401,8 @@ var app = {
 
     },
     quitarEventoClick:function(){
-      map.on("click",function({}));
+      console.log("quitando evento");
+      map.off("click");
     }
     
     
