@@ -10,6 +10,10 @@ L.Control.Locate = L.Control.extend({
         drawCircle: true,
         follow: false,  // follow with zoom and pan the user's location
         stopFollowingOnDrag: false, // if follow is true, stop following when map is dragged (deprecated)
+        // if true locate control remains active on click even if the user's location is in view.
+        // clicking control will just pan to location
+        remainActive: false,
+        markerClass: L.circleMarker, // L.circleMarker or L.marker
         // range circle
         circleStyle: {
             color: '#136AEC',
@@ -34,6 +38,8 @@ L.Control.Locate = L.Control.extend({
             //color: '#FFA500',
             //fillColor: '#FFB000'
         },
+        icon: 'fa fa-map-marker',  // fa-location-arrow or fa-map-marker
+        iconLoading: 'fa fa-spinner fa-spin',
         circlePadding: [0, 0],
         metric: true,
         onLocationError: function(err) {
@@ -44,9 +50,12 @@ L.Control.Locate = L.Control.extend({
         onLocationOutsideMapBounds: function(control) {
             // this event is repeatedly called when the location changes
             control.stopLocate();
-            alert(context.options.strings.outsideMapBoundsMsg);
+            alert(control.options.strings.outsideMapBoundsMsg);
         },
         setView: true, // automatically sets the map view to the user's location
+        // keep the current map zoom level when displaying the user's location. (if 'false', use maxZoom)
+        keepCurrentZoomLevel: false,
+        showPopup: true, // display a popup when the user click on the inner marker
         strings: {
             title: "Show me where I am",
             popup: "You are within {distance} {unit} from this point",
@@ -55,6 +64,16 @@ L.Control.Locate = L.Control.extend({
         locateOptions: {
             maxZoom: Infinity,
             watch: true  // if you overwrite this, visualization cannot be updated
+        }
+    },
+
+    initialize: function (options) {
+        for (var i in options) {
+            if (typeof this.options[i] === 'object') {
+                L.extend(this.options[i], options[i]);
+            } else {
+                this.options[i] = options[i];
+            }
         }
     },
 
@@ -82,22 +101,25 @@ L.Control.Locate = L.Control.extend({
         L.extend(tmp, this.options.circleStyle, this.options.followCircleStyle);
         this.options.followCircleStyle = tmp;
 
-        var link = L.DomUtil.create('a', 'leaflet-bar-part leaflet-bar-part-single', container);
-        link.href = '#';
-        link.title = this.options.strings.title;
+        this._link = L.DomUtil.create('a', 'leaflet-bar-part leaflet-bar-part-single', container);
+        this._link.href = '#';
+        this._link.title = this.options.strings.title;
+
+        this._icon = L.DomUtil.create('span', this.options.icon, this._link);
 
         L.DomEvent
-            .on(link, 'click', L.DomEvent.stopPropagation)
-            .on(link, 'click', L.DomEvent.preventDefault)
-            .on(link, 'click', function() {
-                if (self._active && (self._event === undefined || map.getBounds().contains(self._event.latlng) || !self.options.setView ||
-                    isOutsideMapBounds())) {
+            .on(this._link, 'click', L.DomEvent.stopPropagation)
+            .on(this._link, 'click', L.DomEvent.preventDefault)
+            .on(this._link, 'click', function() {
+                var shouldStop = (self._event === undefined || map.getBounds().contains(self._event.latlng)
+                    || !self.options.setView || isOutsideMapBounds());
+                if (!self.options.remainActive && (self._active && shouldStop)) {
                     stopLocate();
                 } else {
                     locate();
                 }
             })
-            .on(link, 'dblclick', L.DomEvent.stopPropagation);
+            .on(this._link, 'dblclick', L.DomEvent.stopPropagation);
 
         var locate = function () {
             if (self.options.setView) {
@@ -111,9 +133,7 @@ L.Control.Locate = L.Control.extend({
                 startFollowing();
             }
             if (!self._event) {
-                L.DomUtil.addClass(self._container, "requesting");
-                L.DomUtil.removeClass(self._container, "active");
-                L.DomUtil.removeClass(self._container, "following");
+                setClasses('requesting');
             } else {
                 visualizeLocation();
             }
@@ -155,7 +175,7 @@ L.Control.Locate = L.Control.extend({
             if (self.options.stopFollowingOnDrag) {
                 map.off('dragstart', stopFollowing);
             }
-            visualizeLocation();
+            setContainerStyle();
         };
 
         var isOutsideMapBounds = function () {
@@ -176,7 +196,7 @@ L.Control.Locate = L.Control.extend({
                 } else {
                     map.fitBounds(self._event.bounds, {
                         padding: self.options.circlePadding,
-                        maxZoom: self._locateOptions.maxZoom
+                        maxZoom: self.options.keepCurrentZoomLevel ? map.getZoom() : self._locateOptions.maxZoom
                     });
                 }
                 self._locateOnNextLocationFound = false;
@@ -219,30 +239,54 @@ L.Control.Locate = L.Control.extend({
                 mStyle = self.options.markerStyle;
             }
 
-            var t = self.options.strings.popup;
-            if (!self._circleMarker) {
-                self._circleMarker = L.circleMarker(self._event.latlng, mStyle)
-                    .bindPopup(L.Util.template(t, {distance: distance, unit: unit}))
+            if (!self._marker) {
+                self._marker = self.options.markerClass(self._event.latlng, mStyle)
                     .addTo(self._layer);
             } else {
-                self._circleMarker.setLatLng(self._event.latlng)
-                    .bindPopup(L.Util.template(t, {distance: distance, unit: unit}))
-                    ._popup.setLatLng(self._event.latlng);
+                self._marker.setLatLng(self._event.latlng);
                 for (o in mStyle) {
-                    self._circleMarker.options[o] = mStyle[o];
+                    self._marker.options[o] = mStyle[o];
                 }
             }
 
+			var t = self.options.strings.popup;
+            if (self.options.showPopup && t) {
+              self._marker.bindPopup(L.Util.template(t, {distance: distance, unit: unit}))
+                  ._popup.setLatLng(self._event.latlng);
+            }
+
+            setContainerStyle();
+        };
+
+        var setContainerStyle = function() {
             if (!self._container)
                 return;
             if (self._following) {
-                L.DomUtil.removeClass(self._container, "requesting");
-                L.DomUtil.addClass(self._container, "active");
-                L.DomUtil.addClass(self._container, "following");
+                setClasses('following');
             } else {
-                L.DomUtil.removeClass(self._container, "requesting");
-                L.DomUtil.addClass(self._container, "active");
-                L.DomUtil.removeClass(self._container, "following");
+                setClasses('active');
+            }
+        };
+
+        var setClasses = function(state) {
+            if (state == 'requesting') {
+                L.DomUtil.removeClasses(self._container, "active following");
+                L.DomUtil.addClasses(self._container, "requesting");
+
+                L.DomUtil.removeClasses(self._icon, self.options.icon);
+                L.DomUtil.addClasses(self._icon, self.options.iconLoading);
+            } else if (state == 'active') {
+                L.DomUtil.removeClasses(self._container, "requesting following");
+                L.DomUtil.addClasses(self._container, "active");
+
+                L.DomUtil.removeClasses(self._icon, self.options.iconLoading);
+                L.DomUtil.addClasses(self._icon, self.options.icon);
+            } else if (state == 'following') {
+                L.DomUtil.removeClasses(self._container, "requesting");
+                L.DomUtil.addClasses(self._container, "active following");
+
+                L.DomUtil.removeClasses(self._icon, self.options.iconLoading);
+                L.DomUtil.addClasses(self._icon, self.options.icon);
             }
         };
 
@@ -257,6 +301,9 @@ L.Control.Locate = L.Control.extend({
         var stopLocate = function() {
             map.stopLocate();
             map.off('dragstart', stopFollowing);
+            if (self.options.follow && self._following) {
+                stopFollowing();
+            }
 
             L.DomUtil.removeClass(self._container, "requesting");
             L.DomUtil.removeClass(self._container, "active");
@@ -264,13 +311,13 @@ L.Control.Locate = L.Control.extend({
             resetVariables();
 
             self._layer.clearLayers();
-            self._circleMarker = undefined;
+            self._marker = undefined;
             self._circle = undefined;
         };
 
         var onLocationError = function (err) {
             // ignore time out error if the location is watched
-            if (err.code == 3 && this._locateOptions.watch) {
+            if (err.code == 3 && self._locateOptions.watch) {
                 return;
             }
 
@@ -281,6 +328,7 @@ L.Control.Locate = L.Control.extend({
         // event hooks
         map.on('locationfound', onLocationFound, self);
         map.on('locationerror', onLocationError, self);
+        map.on('unload', stopLocate, self);
 
         // make locate functions available to outside world
         this.locate = locate;
@@ -301,3 +349,17 @@ L.Map.addInitHook(function () {
 L.control.locate = function (options) {
     return new L.Control.Locate(options);
 };
+
+(function(){
+  // leaflet.js raises bug when trying to addClass / removeClass multiple classes at once
+  // Let's create a wrapper on it which fixes it.
+  var LDomUtilApplyClassesMethod = function(method, element, classNames) {
+    classNames = classNames.split(' ');
+    classNames.forEach(function(className) {
+        L.DomUtil[method].call(this, element, className);
+    });
+  };
+
+  L.DomUtil.addClasses = function(el, names) { LDomUtilApplyClassesMethod('addClass', el, names); };
+  L.DomUtil.removeClasses = function(el, names) { LDomUtilApplyClassesMethod('removeClass', el, names); };
+})();

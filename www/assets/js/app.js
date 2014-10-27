@@ -119,7 +119,8 @@ var app = {
 
          if(opcion==="posicion-actual"){
             app.mostrarMensaje("Buscando los eventos cercanos a su posicion");
-            map.locate({setView: true, watch: true}).on('locationfound', 
+            $("#resetearBusqueda").show();
+            map.locate({setView: true, watch: false}).on('locationfound', 
               function(e){
                 // TODO : agregar marker y circulo de la posicion               
                 app.buscar(categoria,e.latlng);              
@@ -267,7 +268,7 @@ var app = {
           weight: 1,
           clickable: false
         },
-        //icon: "icon-direction",
+        //  icon: "icon-direction",
         metric: false,
         strings: {
           title: "Mi ubicacion",
@@ -354,7 +355,7 @@ var app = {
         $("#resultados tr").click(function(e){
             var feature=app.formatearaGeojson(r[$(this).attr('id')]);
             var icono = {
-                radius: 8,
+                radius: 4,
                 fillColor: "#ff7800",
                 color: "#000",
                 weight: 1,
@@ -401,7 +402,6 @@ var app = {
 
     },
     quitarEventoClick:function(){
-      console.log("quitando evento");
       map.off("click");
     }
     
