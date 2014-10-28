@@ -98,6 +98,10 @@ var app = {
         return false;
       });
 
+      $("#acerca-btn").click(function(){
+        $("#acerca-modal").modal("show");
+      });
+
       $(".esconder-panel").click(function(){
         var lado=$(this).data("side");
         (lado=="left")? $("#sidebar").toggle() : $("#layersbar").toggle() ;
