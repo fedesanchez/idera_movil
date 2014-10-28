@@ -386,6 +386,8 @@ var app = {
         app.features.eachLayer(function(l){
           l.bindPopup("<b>"+l.feature.properties.nombre+"</b>");
         });        
+
+        //Al seleccionar un resultado del sidebar
         $("#resultados tr").click(function(e){
             
             var id=$(this).attr('id');
@@ -393,13 +395,11 @@ var app = {
             app.features.eachLayer(function(l){
               if(Number(id)==cont){
                 var latlng=l._latlng;
-                
                 map.setView(latlng,15);
-                return true;
-                //l.openPopup();
-              }else{
-                cont++;
-              }
+                l.openPopup();
+              };
+              cont++;
+              
             });
             
         });
