@@ -43,6 +43,17 @@ var app = {
           activa:false,
           subdomains: ["oatile1", "oatile2", "oatile3", "oatile4"],
           attribution:''
+        },{
+          id:"ign-base",
+          titulo:"Topónimos IGN",
+          id_servicio:"IGN",
+          layers:"capabaseargenmap",
+          format: 'image/png8',
+          transparent: true,
+          version: '1.1.0',
+          activa:false,
+          tipo:"wms",
+          attribution: ""
         }      
       ],
       superpuestas:[
@@ -154,7 +165,12 @@ var app = {
                       </tr>";
         $("#capas-base").append(tr);               
         if(capa.activa){
-           L.tileLayer(capa.url, capa).addTo(map);
+          if((capa.tipo) && (capa.tipo=="wms")){
+            L.tileLayer.wms(this.servicios[capa.id_servicio], capa).addTo(map);
+          }else{
+           L.tileLayer(capa.url, capa).addTo(map); 
+          }
+           
         }
       };
       
@@ -212,8 +228,14 @@ var app = {
           var l=layer.options;
           if(l.base){
             map.removeLayer(layer);
-            var datos_nueva_capa=app.getCapaPorId(id,true);            
-            var nueva_capa=L.tileLayer(datos_nueva_capa.url, datos_nueva_capa);
+            var datos_nueva_capa=app.getCapaPorId(id,true);      
+            //Agrego la capa
+            if((datos_nueva_capa.tipo) && (datos_nueva_capa.tipo=="wms")){
+              var nueva_capa=L.tileLayer.wms(app.servicios[datos_nueva_capa.id_servicio], datos_nueva_capa);
+            }else{
+              var nueva_capa=L.tileLayer(datos_nueva_capa.url, datos_nueva_capa); 
+            }      
+            
             map.addLayer(nueva_capa);
             nueva_capa.bringToBack();
           }
