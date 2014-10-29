@@ -136,11 +136,10 @@ var app = {
          if(opcion==="posicion-actual"){
             app.mostrarMensaje("Buscando los eventos cercanos a su posicion");
             $("#resetearBusqueda").show();
-            map.locate({setView: true, watch: false}).on('locationfound', 
-              function(e){
-                // TODO : agregar marker y circulo de la posicion               
-                app.buscar(categoria,e.latlng);              
-              });
+            map.locate({setView: false, watch: false}).on('locationfound', function(e){
+              app.buscar(categoria,e.latlng);
+              //map.on("locationfound",function(){});              
+            });
          }else{
                 app.mostrarMensajeFlotante("Seleccione con un click <br>donde quiere realizar la búsqueda");
                 map.on("click", function(e) {                
@@ -285,7 +284,7 @@ var app = {
         drawCircle: true,
         follow: false, //para que no siga
         setView: true,
-        keepCurrentZoomLevel: true,
+        //keepCurrentZoomLevel: true,
         markerStyle: {
           weight: 1,
           opacity: 0.8,
@@ -303,8 +302,8 @@ var app = {
           outsideMapBoundsMsg: "Parece que estas ubicado afuera de las fronteras del mapa"
         },
         locateOptions: {
-          maxZoom: 18,
-          watch: true,
+          maxZoom: 17,
+          watch: false, // importante para que no se llame infinitamente el evento onlocationfound (que llama a buscar)
           enableHighAccuracy: true,
           maximumAge: 10000,
           timeout: 10000
@@ -334,6 +333,7 @@ var app = {
       this.mapa=map;
     },
     buscar: function(categoria,latlng){
+        app.features.clearLayers();
         $.ajax({
                 url:"http://www.idera.gob.ar/mapa/idera_movil/buscar.php",
                 data:{
@@ -346,6 +346,7 @@ var app = {
         	})
         	 .fail(function() {
                 	app.mostrarMensaje( "ERROR: error al conectarse al servidor." );
+                  setTimeout(app.resetearBusqueda(),2000);
         	});
     },
     formatearaGeojson:function(f){
@@ -415,6 +416,7 @@ var app = {
         
         $("#categorias").fadeIn();
         $("#opcion-consulta").fadeOut();
+        $("#posicion-actual").fadeOut();
         $("#resetearBusqueda").fadeOut();
         
     },
